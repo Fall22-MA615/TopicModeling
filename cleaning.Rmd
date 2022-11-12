@@ -11,6 +11,7 @@ library(tidyverse)
 library(dplyr)
 library(tidyr)
 library(DescTools)
+library(tokenizers)
 ```
 
 ##Import Data
@@ -32,13 +33,10 @@ text_df <- text_df[1:100,]
 
 ## Tokenizing, Removing stopwords
 ```{r pressure, echo=FALSE}
-library(tokenizers)
-library(tidytext)
-library(DescTools)
 
 ## create bigrams
 token <- text_df %>%
-  unnest_tokens(word, sentence)
+  unnest_tokens(word, review)
 
 ## create a stop word vector
 stop <-  unlist(stop_words[,1])
@@ -58,10 +56,10 @@ remove <- check$word %in% stop
 ## to make it easier to see create a data frame
 d <- cbind(token,remove)
 
-## create an index of bigram
+## create an index of words(not stopwords)
 f <- which(d$remove == FALSE)
 
 clean_token <- d %>% slice(f) %>% select(-remove)
 
-rm(check,d,text_df,token)
+rm(check,d,token)
 ```

@@ -15,16 +15,19 @@ library(DescTools)
 
 ##Import Data
 ```{r cars}
-imdb <- read.csv("/Users/jiunlee/MSSP22/Fidelity/IMDB Dataset.csv")
+imdb <- read_csv ("/Users/jiunlee/MSSP22/Fidelity/IMDB Dataset.csv", 
+                    col_names = TRUE,
+                    show_col_types = FALSE)
 imdb <- imdb %>% select(-sentiment)
 
 #remove duplicates of review
 imdb <- unique(imdb)
 
-
 ## sample down
-text_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
-text_df <- imdb[1:100,]
+
+review_index <- 1:dim(imdb)[1]
+text_df <- cbind(review_index,imdb)
+text_df <- text_df[1:100,]
 ```
 
 ## Tokenizing, Removing stopwords

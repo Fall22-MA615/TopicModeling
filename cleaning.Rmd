@@ -1,0 +1,63 @@
+---
+title: "Topic Modeling"
+author: "Group 10"
+date: "2022-11-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+```
+
+##Import Data
+```{r cars}
+imdb <- read.csv("/Users/jiunlee/MSSP22/Fidelity/IMDB Dataset.csv")
+imdb <- imdb %>% select(-sentiment)
+
+#remove duplicates of review
+imdb <- unique(imdb)
+
+
+## sample down
+text_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
+text_df <- imdb[1:100,]
+```
+
+## Tokenizing, Removing stopwords
+```{r pressure, echo=FALSE}
+library(tokenizers)
+library(tidytext)
+library(DescTools)
+
+## create bigrams
+token <- text_df %>%
+  unnest_tokens(word, sentence)
+
+## create a stop word vector
+stop <-  unlist(stop_words[,1])
+
+## drop the attribute
+stop <- StripAttr(stop)
+
+## add to the stop list
+stop <- c(stop, "br")
+
+## split the bigram list into two columns
+check <-  token
+
+## check both words individually agains stop word lists
+remove <- check$word %in% stop
+
+## to make it easier to see create a data frame
+d <- cbind(token,remove)
+
+## create an index of bigram
+f <- which(d$remove == FALSE)
+
+clean_token <- d %>% slice(f) %>% select(-remove)
+
+rm(check,d,text_df,token)
+```

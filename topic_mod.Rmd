@@ -1,0 +1,110 @@
+---
+title: "topic_mod"
+author: 'Group 10: Bill Gao, Jiun Lee, Priam Vyas, Danya Zhang'
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(tidytext)
+library(DescTools)
+library(tokenizers)
+library(readxl)
+```
+
+##Import Data
+```{r cars}
+imdb <- read_csv("/Users/dz/Documents/MSSP/MA615/Topic Modeling/Topic-Modeling/imdb_data.csv", col_names = TRUE,
+                  show_col_types = FALSE)
+imdb <- imdb %>% select(-sentiment)
+#remove duplicates of review
+imdb <- unique(imdb)
+## sample down
+review_index <- 1:dim(imdb)[1]
+text_df <- cbind(review_index,imdb)
+text_df <- text_df[1:100,]
+```
+
+## Tokenizing, Removing stopwords
+```{r pressure, echo=FALSE}
+library(stringr)
+## tokenizing
+token <- text_df %>%
+  unnest_tokens(word, review) %>%
+  count(review_index, word, sort=TRUE) %>%
+  rename(count=n)
+  
+## create a stop word vector
+stop <-  unlist(stop_words[,1])
+## drop the attribute
+stop <- StripAttr(stop)
+
+check <-  token
+
+## check words agains stop word lists
+remove <- check$word %in% stop
+## to make it easier to see create a data frame
+d <- cbind(token,remove)
+## create an index of words(not stopwords)
+f <- which(d$remove == FALSE)
+clean_token <- d %>% slice(f) %>% select(-remove)
+rm(check,d,token)
+
+#subset data frame that has no meaningless words
+strings <- c("br","movie","film", "scene", "character","story","bit","lot","bad","act","hard","awful","good","plot","people", "cinema","audience","coburn","cast","heston","jimmy", "fred","worst","sir")
+
+meaningless <- str_detect(clean_token$word, paste(strings, collapse = "|"))
+has_meaning <- which(meaningless==F)
+clean_token <- clean_token %>% slice(has_meaning)
+
+```
+
+```{r}
+#create lda model
+library(topicmodels)
+
+#convert sample token tibble to document term matrix for lda
+clean_token_dmat <- clean_token %>%
+  cast_dtm(review_index, word, count)
+
+#select k=8 because 8 general film genres
+imdb_lda <- LDA(clean_token_dmat, k = 8, control = list(seed = 1234))
+imdb_topics <- tidy(imdb_lda, matrix = "beta")
+```
+
+```{r}
+library(ggplot2)
+imdb_top_terms <- imdb_topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 6) %>% 
+  ungroup() %>%
+  arrange(topic, -beta)
+
+imdb_top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+```
+
+```{r}
+#gamma: per-document-per-topic probabilities
+imdb_documents <- tidy(imdb_lda, matrix = "gamma")
+imdb_documents
+
+#most common words in document
+tidy(clean_token_dmat) %>%
+  filter(document == 6) %>%
+  arrange(desc(count))
+
+assignments <- augment(imdb_lda, data = clean_token_dmat)
+assignments
+```
+

@@ -64,6 +64,7 @@ has_meaning <- which(meaningless==F)
 clean_token <- clean_token %>% slice(has_meaning)
 
 ```
+Here, we are cleaning the data and removing stop words that don't mean anything.
 
 ```{r}
 #create lda model
@@ -74,9 +75,10 @@ clean_token_dmat <- clean_token %>%
   cast_dtm(review_index, word, count)
 
 #select k=8 because 8 general film genres
-imdb_lda <- LDA(clean_token_dmat, k = 8, control = list(seed = 1234))
+imdb_lda <- LDA(clean_token_dmat, k = 6, control = list(seed = 1234))
 imdb_topics <- tidy(imdb_lda, matrix = "beta")
 ```
+
 
 ```{r}
 library(ggplot2)
@@ -93,6 +95,8 @@ imdb_top_terms %>%
   facet_wrap(~ topic, scales = "free") +
   scale_y_reordered()
 ```
+The plot above shows the top 6 words for each topic in our LDA. We've split up our LDA into 6 genres, which represents the number of topics we have.
+
 
 ```{r}
 #gamma: per-document-per-topic probabilities
@@ -107,4 +111,7 @@ tidy(clean_token_dmat) %>%
 assignments <- augment(imdb_lda, data = clean_token_dmat)
 assignments
 ```
+The assignments tibble above count up the words for each topic. 
+
+
 

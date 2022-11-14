@@ -129,9 +129,10 @@ top_words <- lda_gamma %>%
 
 top_words
 
-#Found the most frequent words used in the documents. Used the gamma value to get the top 10% of the most occuring words in the document.
+#Found the most frequent words used in the documents. Used the gamma value to get the top 10% of the most occurring words in the document.
 
 ```
+
 ```{r}
 top_words %>%
   group_by(topic) %>%
@@ -145,7 +146,7 @@ top_words %>%
   scale_y_reordered() +
   facet_wrap(~ topic, ncol = 4, scales = "free")
 
-#Graphed
+#Graphed the most occurring words in each LDA to get analyse the type of document based on the words used.
 
 ```
 

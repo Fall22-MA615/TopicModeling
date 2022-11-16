@@ -3,6 +3,7 @@ title: "Topic_Modeling"
 author: 'Group 10: Bill Gao, Jiun Lee, Priam Vyas, Danya Zhang'
 date: "`r Sys.Date()`"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
 ---
@@ -22,7 +23,7 @@ library(readxl)
 ##Import Data from kaggle
 ```{r}
 ##Import Data
-imdb <- read_csv ("/Users/billg/Desktop/MA 615 F22/Topic-Modeling/IMDB Dataset.csv", 
+imdb <- read_csv ("/Users/jiunlee/MSSP22/Fidelity/IMDB Dataset.csv", 
                     col_names = TRUE,
                     show_col_types = FALSE)
 ##Remove sentiment column since we don't use it.

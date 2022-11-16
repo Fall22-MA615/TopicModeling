@@ -16,5 +16,5 @@ This assignment includes the following Processes:
 8. Full analsis and explanation of the graphs
 
 We used Rmarkdown files to create the report then knit our final html report.
-Please check the Final_Topic_Modeling.html for our finalized report. Enjoy.
+Please check the Final_Topic_Modeling.pdf for our finalized report. Enjoy.
 
